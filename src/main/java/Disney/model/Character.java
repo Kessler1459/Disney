@@ -8,6 +8,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import javax.persistence.*;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
 import java.util.List;
 
 @AllArgsConstructor
@@ -21,9 +24,12 @@ public class Character {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Integer id;
     private String image;
+    @NotNull
     private String name;
+    @Positive
     private Integer age;
     private String history;
+    @Positive
     private float weight;
     @ManyToMany(mappedBy = "characters")
     private List<Film> films;
