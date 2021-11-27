@@ -1,5 +1,6 @@
 package Disney.service;
 
+import Disney.model.User;
 import Disney.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,5 +12,13 @@ public class UserService {
     @Autowired
     public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
+    }
+
+    public User addUser(User user) {
+        return userRepository.save(user);
+    }
+
+    public User findByEmail(String email) {
+        return  userRepository.findByEmail(email).orElse(null);
     }
 }
