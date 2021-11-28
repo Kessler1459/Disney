@@ -5,6 +5,7 @@ import Disney.model.DTO.LoginResponse;
 import Disney.model.DTO.UserDTO;
 import Disney.model.DTO.UserLoginDTO;
 import Disney.model.User;
+import Disney.service.EmailService;
 import Disney.service.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -20,6 +21,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.io.IOException;
 import java.util.Date;
 import static Disney.utils.Constants.JWT_SECRET;
 import static Disney.utils.EntityUrlBuilder.buildURL;
@@ -31,22 +34,25 @@ public class UserController {
     private final PasswordEncoder passwordEncoder;
     private final ModelMapper modelMapper;
     private final ObjectMapper objectMapper;
+    private final EmailService emailService;
 
     @Autowired
-    public UserController(UserService userService, PasswordEncoder passwordEncoder, ModelMapper modelMapper, ObjectMapper objectMapper) {
+    public UserController(UserService userService, PasswordEncoder passwordEncoder, ModelMapper modelMapper, ObjectMapper objectMapper, EmailService emailService) {
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
         this.modelMapper = modelMapper;
         this.objectMapper = objectMapper;
+        this.emailService = emailService;
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<PostResponse> addUser(@RequestBody User user) {
+    public ResponseEntity<PostResponse> addUser(@RequestBody User user) throws IOException {
         if(user.getPassword()!=null){
             user.setPassword(passwordEncoder.encode(user.getPassword()));
         }
         user = userService.addUser(user);
         PostResponse p = new PostResponse(buildURL("api/auth/users", user.getId()), HttpStatus.CREATED);
+        emailService.sendEmail("Welcome","Hi",user.getEmail());
         return ResponseEntity.created((p.getUrl())).body(p);
     }
 
